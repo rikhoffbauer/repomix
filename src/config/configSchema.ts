@@ -49,6 +49,18 @@ export const repomixConfigBaseSchema = z.object({
       encoding: z.string().optional(),
     })
     .optional(),
+  ai: z.object({
+    enabled: z.boolean().optional(),
+    provider: z.object({
+      type: llmProviderSchema,
+      apiKey: z.string(),
+      model: z.string(),
+      temperature: z.number().optional(),
+      maxTokens: z.number().optional(),
+      baseUrl: z.string().optional(),
+    }).optional(),
+    sections: aiSectionsSchema.optional(),
+  }).optional(),
 });
 
 // Default config schema with default values
@@ -91,6 +103,18 @@ export const repomixConfigDefaultSchema = z.object({
         .transform((val) => val as TiktokenEncoding),
     })
     .default({}),
+  ai: z.object({
+    enabled: z.boolean().optional(),
+    provider: z.object({
+      type: llmProviderSchema,
+      apiKey: z.string(),
+      model: z.string(),
+      temperature: z.number().optional(),
+      maxTokens: z.number().optional(),
+      baseUrl: z.string().optional(),
+    }).optional(),
+    sections: aiSectionsSchema.optional(),
+  }).optional(),
 });
 
 export const repomixConfigFileSchema = repomixConfigBaseSchema;
