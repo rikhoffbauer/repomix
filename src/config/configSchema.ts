@@ -49,6 +49,7 @@ export const repomixConfigBaseSchema = z.object({
       encoding: z.string().optional(),
     })
     .optional(),
+  ai: aiConfigSchema.optional(),
 });
 
 // Default config schema with default values
