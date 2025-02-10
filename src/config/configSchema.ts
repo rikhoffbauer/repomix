@@ -112,3 +112,46 @@ export type RepomixConfigCli = z.infer<typeof repomixConfigCliSchema>;
 export type RepomixConfigMerged = z.infer<typeof repomixConfigMergedSchema>;
 
 export const defaultConfig = repomixConfigDefaultSchema.parse({});
+
+// AI provider type enum
+export const aiProviderTypeSchema = z.enum(['openai', 'anthropic', 'openrouter']);
+export type AiProviderType = z.infer<typeof aiProviderTypeSchema>;
+
+// AI section type enum
+export const aiSectionTypeSchema = z.enum([
+  'architecture',
+  'functionality',
+  'security',
+  'dependencies',
+  'fileOverview',
+  'systemContext',
+  'testing',
+  'deployment',
+]);
+export type AiSectionType = z.infer<typeof aiSectionTypeSchema>;
+
+const aiSectionConfigSchema = z.object({
+  enabled: z.boolean(),
+  prompt: z.string().optional(),
+  maxTokens: z.number().positive().optional(),
+});
+
+const aiProviderConfigSchema = z.object({
+  type: aiProviderTypeSchema,
+  apiKey: z.string(),
+  model: z.string(),
+  maxConcurrentRequests: z.number().positive().optional(),
+  temperature: z.number().min(0).max(2).optional(),
+  baseUrl: z.string().url().optional(),
+});
+
+export const repomixConfigBaseSchema = repomixConfigBaseSchema.extend({
+  ai: z.object({
+    enabled: z.boolean().optional(),
+    provider: aiProviderConfigSchema.optional(),
+    sections: z.record(aiSectionTypeSchema, aiSectionConfigSchema).optional(),
+    globalMaxTokens: z.number().positive().optional(),
+  }).optional(),
+});
+
+// ... existing code ...
