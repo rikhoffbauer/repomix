@@ -49,9 +49,39 @@ export const repomixConfigBaseSchema = z.object({
       encoding: z.string().optional(),
     })
     .optional(),
+  ai: z
+    .object({
+      enabled: z.boolean().optional(),
+      provider: z
+        .object({
+          type: z.enum(['openai', 'anthropic', 'openrouter']).optional(),
+          apiKey: z.string().optional(),
+          model: z.string().optional(),
+          maxTokens: z.number().optional(),
+          temperature: z.number().optional(),
+        })
+        .optional(),
+      sections: z
+        .object({
+          systemLevel: z.array(z.enum([
+            'architecture_overview',
+            'functional_description',
+            'system_requirements',
+            'security_analysis',
+            'dependency_analysis'
+          ])).optional(),
+          fileLevel: z.array(z.enum([
+            'file_summary',
+            'file_role',
+            'code_quality_review'
+          ])).optional(),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
-// Default config schema with default values
+// Update default config schema
 export const repomixConfigDefaultSchema = z.object({
   output: z
     .object({
@@ -89,6 +119,35 @@ export const repomixConfigDefaultSchema = z.object({
         .string()
         .default('o200k_base')
         .transform((val) => val as TiktokenEncoding),
+    })
+    .default({}),
+  ai: z
+    .object({
+      enabled: z.boolean().default(false),
+      provider: z
+        .object({
+          type: z.enum(['openai', 'anthropic', 'openrouter']).default('openai'),
+          model: z.string().default('gpt-4'),
+          maxTokens: z.number().default(2048),
+          temperature: z.number().default(0.7),
+        })
+        .default({}),
+      sections: z
+        .object({
+          systemLevel: z.array(z.enum([
+            'architecture_overview',
+            'functional_description',
+            'system_requirements',
+            'security_analysis',
+            'dependency_analysis'
+          ])).default(['architecture_overview']),
+          fileLevel: z.array(z.enum([
+            'file_summary',
+            'file_role',
+            'code_quality_review'
+          ])).default(['file_summary']),
+        })
+        .default({}),
     })
     .default({}),
 });
