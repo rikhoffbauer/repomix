@@ -1,5 +1,6 @@
 import type { RepomixConfigMerged } from '../../config/configSchema.js';
 import type { ProcessedFile } from '../file/fileTypes.js';
+import type { AiGeneratedContent } from './aiGeneration/aiSectionTypes.js';
 
 export interface OutputGeneratorContext {
   generationDate: string;
@@ -7,6 +8,7 @@ export interface OutputGeneratorContext {
   processedFiles: ProcessedFile[];
   config: RepomixConfigMerged;
   instruction: string;
+  aiGeneratedContent?: AiGeneratedContent;
 }
 
 export interface RenderContext {
@@ -23,4 +25,5 @@ export interface RenderContext {
   readonly directoryStructureEnabled: boolean;
   readonly escapeFileContent: boolean;
   readonly markdownCodeBlockDelimiter: string;
+  aiGeneratedContent?: AiGeneratedContent;
 }

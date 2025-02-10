@@ -12,6 +12,34 @@ export const defaultFilePathMap: Record<RepomixOutputStyle, string> = {
   xml: 'repomix-output.xml',
 } as const;
 
+// AI provider config schema
+export const aiProviderConfigSchema = z.object({
+  type: z.enum(['openai', 'anthropic', 'openrouter']),
+  apiKey: z.string(),
+  model: z.string(),
+  maxConcurrentRequests: z.number().min(1).optional(),
+  temperature: z.number().min(0).max(2).optional(),
+  baseUrl: z.string().url().optional(),
+});
+
+// AI section config schema
+export const aiSectionConfigSchema = z.object({
+  enabled: z.boolean(),
+  maxTokens: z.number().optional(),
+  prompt: z.string().optional(),
+});
+
+// AI sections config schema
+export const aiSectionsConfigSchema = z.object({
+  architecture_overview: aiSectionConfigSchema,
+  functional_description: aiSectionConfigSchema,
+  system_dependencies: aiSectionConfigSchema,
+  file_summary: aiSectionConfigSchema,
+  file_role: aiSectionConfigSchema,
+  security_considerations: aiSectionConfigSchema,
+  testing_strategy: aiSectionConfigSchema,
+});
+
 // Base config schema
 export const repomixConfigBaseSchema = z.object({
   output: z
@@ -49,6 +77,11 @@ export const repomixConfigBaseSchema = z.object({
       encoding: z.string().optional(),
     })
     .optional(),
+  ai: z.object({
+    enabled: z.boolean().optional(),
+    provider: aiProviderConfigSchema.optional(),
+    sections: aiSectionsConfigSchema.optional(),
+  }).optional(),
 });
 
 // Default config schema with default values
@@ -91,6 +124,23 @@ export const repomixConfigDefaultSchema = z.object({
         .transform((val) => val as TiktokenEncoding),
     })
     .default({}),
+  ai: z.object({
+    enabled: z.boolean().default(false),
+    provider: aiProviderConfigSchema.default({
+      type: 'openai',
+      apiKey: '',
+      model: '',
+    }),
+    sections: aiSectionsConfigSchema.default({
+      architecture_overview: aiSectionConfigSchema.default({ enabled: false }),
+      functional_description: aiSectionConfigSchema.default({ enabled: false }),
+      system_dependencies: aiSectionConfigSchema.default({ enabled: false }),
+      file_summary: aiSectionConfigSchema.default({ enabled: false }),
+      file_role: aiSectionConfigSchema.default({ enabled: false }),
+      security_considerations: aiSectionConfigSchema.default({ enabled: false }),
+      testing_strategy: aiSectionConfigSchema.default({ enabled: false }),
+    }),
+  }).default({}),
 });
 
 export const repomixConfigFileSchema = repomixConfigBaseSchema;
