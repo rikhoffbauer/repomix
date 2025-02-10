@@ -49,9 +49,30 @@ export const repomixConfigBaseSchema = z.object({
       encoding: z.string().optional(),
     })
     .optional(),
+  ai: z
+    .object({
+      enabled: z.boolean().optional(),
+      provider: z.enum(['openai', 'anthropic', 'openrouter']).optional(),
+      apiKey: z.string().optional(),
+      model: z.string().optional(),
+      temperature: z.number().min(0).max(2).optional(),
+      maxTokensPerRequest: z.number().min(1).optional(),
+      sections: z
+        .object({
+          architecture: z.boolean().optional(),
+          functional: z.boolean().optional(),
+          dependencies: z.boolean().optional(),
+          fileSummaries: z.boolean().optional(),
+          fileRoles: z.boolean().optional(),
+          security: z.boolean().optional(),
+          codeQuality: z.boolean().optional(),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
-// Default config schema with default values
+// Update default config schema
 export const repomixConfigDefaultSchema = z.object({
   output: z
     .object({
@@ -89,6 +110,26 @@ export const repomixConfigDefaultSchema = z.object({
         .string()
         .default('o200k_base')
         .transform((val) => val as TiktokenEncoding),
+    })
+    .default({}),
+  ai: z
+    .object({
+      enabled: z.boolean().default(false),
+      provider: z.enum(['openai', 'anthropic', 'openrouter']).default('openai'),
+      model: z.string().default('gpt-4'),
+      temperature: z.number().min(0).max(2).default(0.3),
+      maxTokensPerRequest: z.number().min(1).default(4096),
+      sections: z
+        .object({
+          architecture: z.boolean().default(true),
+          functional: z.boolean().default(true),
+          dependencies: z.boolean().default(true),
+          fileSummaries: z.boolean().default(true),
+          fileRoles: z.boolean().default(true),
+          security: z.boolean().default(true),
+          codeQuality: z.boolean().default(true),
+        })
+        .default({}),
     })
     .default({}),
 });
