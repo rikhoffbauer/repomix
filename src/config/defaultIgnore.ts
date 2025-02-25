@@ -6,15 +6,12 @@ export const defaultIgnoreList = [
   '.svn/**',
 
   // Dependency directories
-  'node_modules/**',
   '**/node_modules/**',
-  'bower_components/**',
   '**/bower_components/**',
-  'jspm_packages/**',
   '**/jspm_packages/**',
   'vendor/**',
-  '.bundle/**',
-  '.gradle/**',
+  '**/.bundle/**',
+  '**/.gradle/**',
   'target/**',
 
   // Logs
@@ -119,8 +116,8 @@ export const defaultIgnoreList = [
   'temp/**',
 
   // repomix output
-  'repomix-output.*',
-  'repopack-output.*', // Legacy
+  '**/repomix-output.*',
+  '**/repopack-output.*', // Legacy
 
   // Essential Node.js-related entries
   '**/package-lock.json',

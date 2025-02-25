@@ -590,6 +590,12 @@ Here's an explanation of the configuration options:
 | `security.enableSecurityCheck`   | Whether to perform security checks on files                                                                                  | `true`                 |
 | `tokenCount.encoding`            | Token count encoding for AI model context limits (e.g., `o200k_base`, `cl100k_base`)                                         | `"o200k_base"`         |
 
+The configuration file supports [JSON5](https://json5.org/) syntax, which allows:
+- Comments (both single-line and multi-line)
+- Trailing commas in objects and arrays
+- Unquoted property names
+- More relaxed string syntax
+
 Example configuration:
 
 ```json5
@@ -607,7 +613,7 @@ Example configuration:
     "showLineNumbers": false,
     "copyToClipboard": true,
     "topFilesLength": 5,
-    "includeEmptyDirectories": false
+    "includeEmptyDirectories": false,
   },
   "include": [
     "**/*"
@@ -619,14 +625,14 @@ Example configuration:
     "customPatterns": [
       "additional-folder",
       "**/*.log"
-    ]
+    ],
   },
   "security": {
     "enableSecurityCheck": true
   },
   "tokenCount": {
     "encoding": "o200k_base"
-  }
+  },
 }
 ```
 

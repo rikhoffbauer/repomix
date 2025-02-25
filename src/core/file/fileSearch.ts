@@ -4,6 +4,7 @@ import { globby } from 'globby';
 import { minimatch } from 'minimatch';
 import type { RepomixConfigMerged } from '../../config/configSchema.js';
 import { defaultIgnoreList } from '../../config/defaultIgnore.js';
+import { RepomixError } from '../../shared/errorHandle.js';
 import { logger } from '../../shared/logger.js';
 import { sortPaths } from './filePathSort.js';
 import { PermissionError, checkDirectoryPermissions } from './permissionCheck.js';
@@ -73,11 +74,13 @@ export const searchFiles = async (rootDir: string, config: RepomixConfigMerged):
   // First check directory permissions
   const permissionCheck = await checkDirectoryPermissions(rootDir);
 
-  if (!permissionCheck.hasPermission) {
+  if (permissionCheck.details?.read !== true) {
     if (permissionCheck.error instanceof PermissionError) {
       throw permissionCheck.error;
     }
-    throw new Error(`Cannot access directory ${rootDir}: ${permissionCheck.error?.message}`);
+    throw new RepomixError(
+      `Target directory is not readable or does not exist. Please check folder access permissions for your terminal app.\npath: ${rootDir}`,
+    );
   }
 
   const includePatterns =

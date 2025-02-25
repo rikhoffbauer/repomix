@@ -28,3 +28,8 @@ services:
       - PORT=8080
     # override default command
     command: sh -c "npm i && npm run dev"
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./server
+          target: /app

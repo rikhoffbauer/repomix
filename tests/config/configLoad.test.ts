@@ -107,6 +107,37 @@ describe('configLoad', () => {
         ignore: { useGitignore: true },
       });
     });
+
+    test('should parse config file with JSON5 features', async () => {
+      const configWithJSON5Features = `{
+        // Output configuration
+        output: {
+          filePath: 'test-output.txt',
+          style: 'plain',
+        },
+        /* Ignore configuration */
+        ignore: {
+          useGitignore: true, // Use .gitignore file
+          customPatterns: [
+            '*.log',
+            '*.tmp',
+            '*.temp', // Trailing comma
+          ],
+        },
+      }`;
+
+      vi.mocked(fs.readFile).mockResolvedValue(configWithJSON5Features);
+      vi.mocked(fs.stat).mockResolvedValue({ isFile: () => true } as Stats);
+
+      const result = await loadFileConfig(process.cwd(), 'test-config.json');
+      expect(result).toEqual({
+        output: { filePath: 'test-output.txt', style: 'plain' },
+        ignore: {
+          useGitignore: true,
+          customPatterns: ['*.log', '*.tmp', '*.temp'],
+        },
+      });
+    });
   });
 
   describe('mergeConfigs', () => {
