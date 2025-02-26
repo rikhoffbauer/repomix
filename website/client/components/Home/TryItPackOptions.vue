@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { HelpCircle } from 'lucide-vue-next';
-import { AnalyticsAction } from './utils/analytics.js';
-import { handleOptionChange } from './utils/requestHandlers.js';
+import { AnalyticsAction } from '../utils/analytics';
+import { handleOptionChange } from '../utils/requestHandlers';
 
 const props = defineProps<{
   format: 'xml' | 'markdown' | 'plain';

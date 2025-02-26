@@ -26,7 +26,7 @@ describe('permissionCheck', () => {
       const result = await checkDirectoryPermissions(testDirPath);
 
       expect(result).toEqual({
-        hasPermission: true,
+        hasAllPermission: true,
         details: {
           read: true,
           write: true,
@@ -55,7 +55,7 @@ describe('permissionCheck', () => {
       const result = await checkDirectoryPermissions(testDirPath);
 
       expect(result).toEqual({
-        hasPermission: false,
+        hasAllPermission: false,
         details: {
           read: true,
           write: false,
@@ -74,7 +74,7 @@ describe('permissionCheck', () => {
       const result = await checkDirectoryPermissions(testDirPath);
 
       expect(result).toEqual({
-        hasPermission: false,
+        hasAllPermission: false,
         error: expect.any(PermissionError),
       });
       expect(result.error).toBeInstanceOf(PermissionError);
@@ -89,7 +89,7 @@ describe('permissionCheck', () => {
       const result = await checkDirectoryPermissions(testDirPath);
 
       expect(result).toEqual({
-        hasPermission: false,
+        hasAllPermission: false,
         error: expect.any(PermissionError),
       });
       expect(result.error).toBeInstanceOf(PermissionError);
@@ -104,7 +104,7 @@ describe('permissionCheck', () => {
       const result = await checkDirectoryPermissions(testDirPath);
 
       expect(result).toEqual({
-        hasPermission: false,
+        hasAllPermission: false,
         error: expect.any(PermissionError),
       });
     });
@@ -115,7 +115,7 @@ describe('permissionCheck', () => {
       const result = await checkDirectoryPermissions(testDirPath);
 
       expect(result).toEqual({
-        hasPermission: false,
+        hasAllPermission: false,
         error: new Error('String error'),
       });
     });
@@ -191,7 +191,7 @@ describe('permissionCheck', () => {
       const result = await checkDirectoryPermissions(testDirPath);
 
       expect(result).toEqual({
-        hasPermission: false,
+        hasAllPermission: false,
         error: error,
       });
     });
@@ -211,7 +211,7 @@ describe('permissionCheck', () => {
       const result = await checkDirectoryPermissions(testDirPath);
 
       expect(result).toEqual({
-        hasPermission: false,
+        hasAllPermission: false,
         details: {
           read: true,
           write: false,
@@ -230,7 +230,7 @@ describe('permissionCheck', () => {
       const result = await checkDirectoryPermissions(testDirPath);
 
       expect(result).toEqual({
-        hasPermission: false,
+        hasAllPermission: false,
         details: {
           read: false,
           write: false,

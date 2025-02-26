@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import fs from 'node:fs/promises';
-import { type CliOptions, runRemoteAction } from 'repomix';
+import { type CliOptions, runCli } from 'repomix';
 import { packRequestSchema } from './schemas/request.js';
 import type { PackOptions, PackResult } from './types.js';
 import { generateCacheKey } from './utils/cache.js';
@@ -48,6 +48,7 @@ export async function processRemoteRepo(
 
   // Create CLI options with correct mapping
   const cliOptions = {
+    remote: repoUrl,
     output: outputFilePath,
     style: validatedData.format,
     parsableStyle: validatedData.options.outputParsable,
@@ -60,11 +61,15 @@ export async function processRemoteRepo(
     topFilesLen: 10,
     include: sanitizedIncludePatterns,
     ignore: sanitizedIgnorePatterns,
+    quiet: true, // Enable quiet mode to suppress output
   } as CliOptions;
 
   try {
     // Execute remote action
-    const result = await runRemoteAction(repoUrl, cliOptions);
+    const result = await runCli(['.'], process.cwd(), cliOptions);
+    if (!result) {
+      throw new AppError('Remote action failed to return a result', 500);
+    }
     const { packResult } = result;
 
     // Read the generated file

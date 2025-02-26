@@ -34,3 +34,6 @@ repomix-output.md
 
 # biome
 .biome/
+
+# aider
+.aider*

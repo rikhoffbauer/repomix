@@ -3,21 +3,29 @@ import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { compress } from 'hono/compress';
 import { cors } from 'hono/cors';
-import { logger } from 'hono/logger';
 import { timeout } from 'hono/timeout';
 import { FILE_SIZE_LIMITS } from './constants.js';
 import { processZipFile } from './processZipFile.js';
 import { processRemoteRepo } from './remoteRepo.js';
-import type { ErrorResponse, PackResult } from './types.js';
+import type { PackResult } from './types.js';
 import { handlePackError } from './utils/errorHandler.js';
+import { cloudLogger, createErrorResponse, logError, logInfo } from './utils/logger.js';
 import { getProcessConcurrency } from './utils/processConcurrency.js';
+import { calculateLatency, formatLatencyForDisplay } from './utils/time.js';
 
-// Log metrics
-console.log('Server Process concurrency:', getProcessConcurrency());
+// Log server metrics on startup
+logInfo('Server starting', {
+  metrics: {
+    processConcurrency: getProcessConcurrency(),
+  },
+});
 
 const app = new Hono();
 
-// Set up CORS
+// Setup custom logger
+app.use('*', cloudLogger());
+
+// Configure CORS
 app.use(
   '/*',
   cors({
@@ -29,83 +37,101 @@ app.use(
   }),
 );
 
-// Enable compression for all routes
+// Enable compression
 app.use(compress());
 
-// Set up timeout middleware for /api routes
+// Set timeout for API routes
 app.use('/api', timeout(30000));
 
-// Set up logger middleware
-app.use(logger());
-
-// GET /health
+// Health check endpoint
 app.get('/health', (c) => c.text('OK'));
 
-// POST /api/pack
+// Main packing endpoint
 app.post(
   '/api/pack',
   bodyLimit({
     maxSize: FILE_SIZE_LIMITS.MAX_REQUEST_SIZE,
     onError: (c) => {
-      return c.text('File size too large :(', 413);
+      const requestId = c.get('requestId');
+      const response = createErrorResponse('File size too large', requestId);
+      return c.json(response, 413);
     },
   }),
   async (c) => {
     try {
       const formData = await c.req.formData();
+      const requestId = c.get('requestId');
 
-      // Get format and options from formData
+      // Get form data
       const format = formData.get('format') as 'xml' | 'markdown' | 'plain';
       const options = JSON.parse(formData.get('options') as string);
-
-      // Check if we have a file or URL
       const file = formData.get('file') as File | null;
       const url = formData.get('url') as string | null;
 
+      // Validate input
       if (!file && !url) {
-        return c.json({ error: 'Either repository URL or file is required' } as ErrorResponse, 400);
+        return c.json(createErrorResponse('Either repository URL or file is required', requestId), 400);
       }
 
       if (!['xml', 'markdown', 'plain'].includes(format)) {
-        return c.json({ error: 'Invalid format specified' } as ErrorResponse, 400);
+        return c.json(createErrorResponse('Invalid format specified', requestId), 400);
       }
 
-      // Get client IP address
+      // Get client IP
       const clientIp =
-        c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || c.req.header('cf-connecting-ip') || '0.0.0.0';
+        c.req.header('x-forwarded-for')?.split(',')[0] ||
+        c.req.header('x-real-ip') ||
+        c.req.header('cf-connecting-ip') ||
+        '0.0.0.0';
 
+      const startTime = Date.now();
+
+      // Process file or repository
       let result: PackResult;
       if (file) {
         result = await processZipFile(file, format, options, clientIp);
       } else {
         if (!url) {
-          return c.json({ error: 'Repository URL is required' } as ErrorResponse, 400);
+          return c.json(createErrorResponse('Repository URL is required', requestId), 400);
         }
         result = await processRemoteRepo(url, format, options, clientIp);
       }
 
+      // Log operation result
+      logInfo('Pack operation completed', {
+        requestId,
+        format,
+        repository: result.metadata.repository,
+        duration: formatLatencyForDisplay(startTime),
+        inputType: file ? 'file' : url ? 'url' : 'unknown',
+        metrics: {
+          totalFiles: result.metadata.summary?.totalFiles,
+          totalCharacters: result.metadata.summary?.totalCharacters,
+          totalTokens: result.metadata.summary?.totalTokens,
+        },
+      });
+
       return c.json(result);
     } catch (error) {
-      console.error('Error processing request:', error);
+      // Handle errors
+      logError('Pack operation failed', error instanceof Error ? error : new Error('Unknown error'), {
+        requestId: c.get('requestId'),
+      });
+
       const appError = handlePackError(error);
-      return c.json(
-        {
-          error: appError.message,
-        } as ErrorResponse,
-        appError.statusCode,
-      );
+      return c.json(createErrorResponse(appError.message, c.get('requestId')), appError.statusCode);
     }
   },
 );
 
-// Start the server
+// Start server
 const port = process.env.PORT ? Number.parseInt(process.env.PORT, 10) : 3000;
-console.log(`Server is starting on port ${port}`);
+logInfo(`Server starting on port ${port}`);
 
 serve({
   fetch: app.fetch,
   port,
 });
 
-// Export the app for testing
+// Export app for testing
 export default app;

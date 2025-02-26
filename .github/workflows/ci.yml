@@ -56,17 +56,6 @@ jobs:
         with:
           args: "-color"
 
-  check-npm-audit:
-    name: Check npm audit
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version-file: .tool-versions
-        cache: npm
-    - run: npm audit
-
   check-typos:
     name: Check typos
     runs-on: ubuntu-latest

@@ -111,7 +111,7 @@ function triggerFileInput() {
   height: 50px;
   display: flex;
   align-items: center;
-  background: white;
+  background: var(--vp-c-bg);
   user-select: none;
 }
 
@@ -150,7 +150,7 @@ function triggerFileInput() {
 }
 
 .icon-folder {
-  color: #64748b;
+  color: var(--vp-c-text-1);
 }
 
 .icon-error {

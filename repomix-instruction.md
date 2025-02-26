@@ -1,39 +1,8 @@
-# Coding Guidelines
-- Follow the Airbnb JavaScript Style Guide.
-- Split files into smaller, focused units when appropriate:
-  - Aim to keep code files under 250 lines. If a file exceeds 250 lines, split it into multiple files based on functionality.
-- Add comments to clarify non-obvious logic. **Ensure all comments are written in English.**
-- Provide corresponding unit tests for all new features.
-
-## Dependencies and Testing
-- Inject dependencies through a deps object parameter for testability
-- Example:
-  ```typescript
-  export const functionName = async (
-    param1: Type1,
-    param2: Type2,
-    deps = {
-      defaultFunction1,
-      defaultFunction2,
-    }
-  ) => {
-    // Use deps.defaultFunction1() instead of direct call
-  };
-  ```
-- Mock dependencies by passing test doubles through deps object
-- Use vi.mock() only when dependency injection is not feasible
-
-----------------------------------------------------------------
-
-# Generate Comprehensive Output
-- Include all content without abbreviation, unless specified otherwise
-- Optimize for handling large codebases while maintaining output quality
-
-----------------------------------------------------------------
-
 # Repomix Project Structure and Overview
 
 This document provides a structural overview of the Repomix project, designed to aid AI code assistants (like Copilot) in understanding the codebase.
+
+Please refer to `README.md` for a complete and up-to-date project overview, and `CONTRIBUTING.md` for implementation guidelines and contribution procedures.
 
 ## Project Overview
 
@@ -77,7 +46,52 @@ repomix/
 
 ----------------------------------------------------------------
 
+# Coding Guidelines
+- Follow the Airbnb JavaScript Style Guide.
+- Split files into smaller, focused units when appropriate:
+  - Aim to keep code files under 250 lines. If a file exceeds 250 lines, split it into multiple files based on functionality.
+- Add comments to clarify non-obvious logic. **Ensure all comments are written in English.**
+- Provide corresponding unit tests for all new features.
+- After implementation, verify changes by running:
+  ```bash
+  npm run lint  # Ensure code style compliance
+  npm run test  # Verify all tests pass
+  ```
+
+## Dependencies and Testing
+- Inject dependencies through a deps object parameter for testability
+- Example:
+  ```typescript
+  export const functionName = async (
+    param1: Type1,
+    param2: Type2,
+    deps = {
+      defaultFunction1,
+      defaultFunction2,
+    }
+  ) => {
+    // Use deps.defaultFunction1() instead of direct call
+  };
+  ```
+- Mock dependencies by passing test doubles through deps object
+- Use vi.mock() only when dependency injection is not feasible
+
+## Generate Comprehensive Output
+- Include all content without abbreviation, unless specified otherwise
+- Optimize for handling large codebases while maintaining output quality
+
+----------------------------------------------------------------
+
 # GitHub Release Note Guidelines
+When writing release notes, please follow these guidelines:
+
+- When referencing issues or PRs, use the gh command to verify the content:
+  ```bash
+  gh issue view <issue-number>  # For checking issue content
+  gh pr view <pr-number>        # For checking PR content
+  ```
+  This helps ensure accuracy in release note descriptions.
+
 Here are some examples of release notes that follow the guidelines:
 
 v0.2.25
@@ -270,4 +284,3 @@ npm update -g repomix
 ---
 
 As always, if you encounter any issues or have suggestions, please let us know through our GitHub issues or join our [Discord community](https://discord.gg/wNYzTwZFku) for support.
-````

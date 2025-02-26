@@ -56,10 +56,11 @@
       />
 
       <div v-if="hasExecuted">
-        <TryItResultViewer
+        <TryItResult
           :result="result"
           :loading="loading"
           :error="error"
+          :repository-url="inputRepositoryUrl"
         />
       </div>
     </form>
@@ -68,14 +69,14 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import type { PackResult } from '../api/client';
+import { handlePackRequest } from '../utils/requestHandlers';
+import { isValidRemoteValue } from '../utils/validation';
 import PackButton from './PackButton.vue';
 import TryItFileUpload from './TryItFileUpload.vue';
 import TryItPackOptions from './TryItPackOptions.vue';
-import TryItResultViewer from './TryItResultViewer.vue';
+import TryItResult from './TryItResult.vue';
 import TryItUrlInput from './TryItUrlInput.vue';
-import type { PackResult } from './api/client';
-import { handlePackRequest } from './utils/requestHandlers';
-import { isValidRemoteValue } from './utils/validation';
 
 // Form input states
 const url = ref('');
@@ -88,6 +89,7 @@ const directoryStructure = ref(true);
 const includePatterns = ref('');
 const ignorePatterns = ref('');
 const outputParsable = ref(false);
+const inputRepositoryUrl = ref('');
 
 // Processing states
 const loading = ref(false);
@@ -131,6 +133,7 @@ async function handleSubmit() {
   error.value = null;
   result.value = null;
   hasExecuted.value = true;
+  inputRepositoryUrl.value = url.value;
 
   const timeoutId = setTimeout(() => {
     if (requestController) {
@@ -216,7 +219,7 @@ function handleFileUpload(file: File) {
   flex: 1;
   height: 48px;
   padding: 0 16px;
-  background: white;
+  background: var(--vp-c-bg);
   cursor: pointer;
   font-size: 16px;
   white-space: nowrap;

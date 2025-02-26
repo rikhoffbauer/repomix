@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import AdmZip from 'adm-zip';
-import { type CliOptions, runDefaultAction } from 'repomix';
+import { type CliOptions, runDefaultAction, setLogLevel } from 'repomix';
 import { packRequestSchema } from './schemas/request.js';
 import type { PackOptions, PackResult } from './types.js';
 import { generateCacheKey } from './utils/cache.js';
@@ -79,7 +79,10 @@ export async function processZipFile(
     topFilesLen: 10,
     include: sanitizedIncludePatterns,
     ignore: sanitizedIgnorePatterns,
+    quiet: true, // Enable quiet mode to suppress output
   } as CliOptions;
+
+  setLogLevel(-1);
 
   const tempDirPath = await createTempDirectory();
 

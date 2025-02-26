@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
+import JSON5 from 'json5';
 import pc from 'picocolors';
-import stripJsonComments from 'strip-json-comments';
 import { RepomixError, rethrowValidationErrorIfZodError } from '../shared/errorHandle.js';
 import { logger } from '../shared/logger.js';
 import {
@@ -70,12 +70,12 @@ export const loadFileConfig = async (rootDir: string, argConfigPath: string | nu
 const loadAndValidateConfig = async (filePath: string): Promise<RepomixConfigFile> => {
   try {
     const fileContent = await fs.readFile(filePath, 'utf-8');
-    const config = JSON.parse(stripJsonComments(fileContent));
+    const config = JSON5.parse(fileContent);
     return repomixConfigFileSchema.parse(config);
   } catch (error) {
     rethrowValidationErrorIfZodError(error, 'Invalid config schema');
     if (error instanceof SyntaxError) {
-      throw new RepomixError(`Invalid JSON in config file ${filePath}: ${error.message}`);
+      throw new RepomixError(`Invalid JSON5 in config file ${filePath}: ${error.message}`);
     }
     if (error instanceof Error) {
       throw new RepomixError(`Error loading config from ${filePath}: ${error.message}`);

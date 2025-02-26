@@ -4,7 +4,7 @@ import { platform } from 'node:os';
 import { logger } from '../../shared/logger.js';
 
 export interface PermissionCheckResult {
-  hasPermission: boolean;
+  hasAllPermission: boolean;
   error?: Error;
   details?: {
     read?: boolean;
@@ -55,13 +55,13 @@ export const checkDirectoryPermissions = async (dirPath: string): Promise<Permis
 
     if (!hasAllPermissions) {
       return {
-        hasPermission: false,
+        hasAllPermission: false,
         details,
       };
     }
 
     return {
-      hasPermission: true,
+      hasAllPermission: true,
       details,
     };
   } catch (error) {
@@ -71,19 +71,19 @@ export const checkDirectoryPermissions = async (dirPath: string): Promise<Permis
         case 'EACCES':
         case 'EISDIR':
           return {
-            hasPermission: false,
+            hasAllPermission: false,
             error: new PermissionError(getMacOSPermissionMessage(dirPath, error.code), dirPath, error.code),
           };
         default:
           logger.debug('Directory permission check error:', error);
           return {
-            hasPermission: false,
+            hasAllPermission: false,
             error: error as Error,
           };
       }
     }
     return {
-      hasPermission: false,
+      hasAllPermission: false,
       error: error instanceof Error ? error : new Error(String(error)),
     };
   }
